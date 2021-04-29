@@ -7,6 +7,13 @@ public class Link extends BaseEntity {
     private String shortLink;
     private Integer forwards;
 
+    public Link() {
+    }
+
+    public Link(String originalLink) {
+        this.originalLink = originalLink;
+    }
+
     public String getOriginalLink() {
         return originalLink;
     }

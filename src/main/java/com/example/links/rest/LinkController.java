@@ -2,7 +2,9 @@ package com.example.links.rest;
 
 import com.example.links.exception.UserExceptions;
 import com.example.links.pojo.Link;
+import com.example.links.pojo.RequestLinkDTO;
 import com.example.links.service.LinkService;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.*;
@@ -40,8 +42,9 @@ public class LinkController {
     }
 
     @PostMapping
-    public Link create(@RequestBody Link link) {
-        return linkService.create(link);
+    public Link create(@RequestBody RequestLinkDTO dto) {
+        // тут поидее лучше использовать modelMapper для маппинга сущностей и дтошек (ввиду ограниченности времени сделал просто через конструктор)
+        return linkService.create(new Link(dto.getOriginalLink()));
     }
 
     @PutMapping("/{id}")

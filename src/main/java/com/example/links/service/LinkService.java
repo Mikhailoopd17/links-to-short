@@ -30,6 +30,7 @@ public class LinkService {
         } while (linkDAO.isExistShortLink(shortLink));
 
         link.setShortLink(shortLink);
+        link.setCreated(LocalDateTime.now());
         linkDAO.create(link);
         return link;
     }
