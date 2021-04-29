@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,5 +64,18 @@ public class LinkService {
 
     public List<String> getTop(Map<String, Object> params) {
         return linkDAO.getTop(params);
+    }
+
+    public Link getOneById(Integer id) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("id", id);
+        params.put("withDeleted", true);
+        params.put("withForwards", true);
+        params.put("limit", 1);
+        List<Link> links = linkDAO.getListByParams(params);
+        if (links == null || links.isEmpty()) {
+            throw new UserExceptions.RestException(String.format("Link with id %s not found!", id));
+        }
+        return links.get(0);
     }
 }

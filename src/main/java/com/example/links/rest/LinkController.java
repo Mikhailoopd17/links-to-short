@@ -41,6 +41,14 @@ public class LinkController {
         return linkService.getListByParams(params);
     }
 
+    @GetMapping("/{id}")
+    public Link getOneById(@PathVariable Integer id) {
+        if (id == null) {
+            throw new UserExceptions.RestException("Id link not set!");
+        }
+        return linkService.getOneById(id);
+    }
+
     @PostMapping
     public Link create(@RequestBody RequestLinkDTO dto) {
         // тут поидее лучше использовать modelMapper для маппинга сущностей и дтошек (ввиду ограниченности времени сделал просто через конструктор)
