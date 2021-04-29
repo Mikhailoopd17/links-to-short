@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.links.dao.LinkDAO">
+
+    <resultMap id="resultMap" type="com.example.links.pojo.Link">
+        <id column="id" property="id"/>
+        <result column="created" property="created"/>
+        <result column="updated" property="updated"/>
+        <result column="deleted" property="deleted"/>
+        <result column="original_link" property="originalLink"/>
+        <result column="short_link" property="shortLink"/>
+        <result column="forwards" property="forwards"/>
+    </resultMap>
+
+    <select id="getListByParams" resultMap="resultMap" parameterType="map">
+        SELECT
+          ln.id,
+          ln.created,
+          ln.updated,
+          ln.deleted,
+          ln.original_link,
+          ln.short_link
+          <if test="params.withForwards != null and params.withForwards">
+              , (SELECT COUNT(id) FROM link_forward lw WHERE ln.id = lw.link_id) as forwards
+          </if>
+        FROM links ln
+        WHERE TRUE
+        <if test="params.withDeleted == null || !params.withDeleted">
+            AND ln.deleted is null
+        </if>
+        <if test="params.id != null">
+            AND id = #{params.id}
+        </if>
+        <if test="params.shortLink != null and !params.shortLink.isEmpty()">
+            AND ln.short_link = #{params.shortLink}
+        </if>
+        <if test="params.limit != null">
+            limit #{params.limit}
+        </if>
+    </select>
+
+    <insert id="create" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO links
+        (created, original_link, short_link)
+        VALUES (now(), #{originalLink}, #{shortLink})
+    </insert>
+
+
+    <select id="getTop" parameterType="map" resultType="java.lang.String">
+        SELECT
+        l.original_link
+        FROM links l
+        WHERE l.deleted IS NULL
+        ORDER BY (SELECT COUNT(id) FROM link_forward lw WHERE l.id = lw.link_id) DESC
+        <if test="params.limit != null">
+            limit #{params.limit}
+        </if>
+    </select>
+
+</mapper>

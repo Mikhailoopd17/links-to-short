@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.links.dao.ForwardDAO">
+
+    <resultMap id="nameMap" type="com.example.links.pojo.StatisticResult">
+        <id property="key" column="param"/>
+        <result property="value" column="forwards"/>
+    </resultMap>
+
+    <select id="getStatistic" resultMap="nameMap" parameterType="map">
+        WITH params as (SELECT extract(
+                                      <choose>
+                                          <when test="params.orderParam.equals('hour')">
+                                              hour
+                                          </when>
+                                          <when test="params.orderParam.equals('minute')">
+                                              minute
+                                          </when>
+                                          <otherwise>
+                                              day
+                                          </otherwise>
+                                      </choose>
+                                            FROM lf.created) AS param
+                        FROM link_forward lf
+				        INNER JOIN links l ON l.id = lf.link_id AND l.deleted IS NULL AND l.short_link = #{params.link})
+        SELECT param,
+        (SELECT COUNT(*) FROM params p2 WHERE p2.param = p1.param) AS forwards
+        FROM params p1
+        GROUP BY param
+        ORDER BY param
+    </select>
+</mapper>
+
